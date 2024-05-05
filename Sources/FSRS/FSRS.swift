@@ -11,14 +11,13 @@ public struct FSRS {
 public extension FSRS {
     func `repeat`(card: Card, now: Date) -> [Rating: SchedulingInfo] {
         var card = card
+        
         if card.status == .new {
             card.elapsedDays = 0
         } else {
-            // Check this is positive...
-            card.elapsedDays = (now.timeIntervalSince(card.lastReview)) / Constants.secondsInDay
+            card.elapsedDays = max(0, (now.timeIntervalSince(card.lastReview)) / Constants.secondsInDay)
         }
         
-        print("Elapsed \(card.elapsedDays)")
         card.lastReview = now
         card.reps += 1
         
