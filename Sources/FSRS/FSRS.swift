@@ -74,15 +74,16 @@ public struct Card: Equatable, Codable {
         self.status = status
         self.lastReview = lastReview
     }
-    
-    func retrievability(now: Date, params: Params) -> Double? {
+
+    func retrievability(for now: Date, params: Params) -> Double? {
         guard status == .review else { return nil }
         let elapsedDays = max(0, (now.timeIntervalSince(lastReview) / Constants.secondsInDay))
         return forgettingCurve(elapsedDays: elapsedDays, params: params)
     }
 
     func forgettingCurve(elapsedDays: Double, params p: Params) -> Double {
-        pow(1.0 + p.factor * elapsedDays / stability, p.decay)
+        guard !stability.isZero else { return 0 }
+        return pow(1.0 + p.factor * elapsedDays / stability, p.decay)
     }
 
     func printLog() {
@@ -374,6 +375,6 @@ public struct FSRS {
     }
 
     public func nextForgetStability(d: Double, s: Double, r: Double) -> Double {
-        p.w[11] * pow(d, -p.w[12]) * (pow(s + 1.0, p.w[13]) - 1) * exp((1.0 - r) * p.w[14])
+        p.w[11] * pow(d, -p.w[12]) * (pow(s + 1.0, p.w[13]) - 1) * exp((1 - r) * p.w[14])
     }
 }
