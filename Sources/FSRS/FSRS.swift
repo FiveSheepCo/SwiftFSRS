@@ -74,8 +74,14 @@ public struct Card: Equatable, Codable {
         self.status = status
         self.lastReview = lastReview
     }
+    
+    func retrievability(now: Date, params: Params) -> Double? {
+        guard status == .review else { return nil }
+        let elapsedDays = max(0, (now.timeIntervalSince(lastReview) / Constants.secondsInDay))
+        return forgettingCurve(elapsedDays: elapsedDays, params: params)
+    }
 
-    func forgettingCurve(params p: Params) -> Double {
+    func forgettingCurve(elapsedDays: Double, params p: Params) -> Double {
         pow(1.0 + p.factor * elapsedDays / stability, p.decay)
     }
 
@@ -273,7 +279,7 @@ public struct FSRS {
             s.schedule(now: now, hardInterval: hardInterval, goodInterval: goodInterval, easyInterval: easyInterval)
 
         case .review:
-            let retrievability = card.forgettingCurve(params: p)
+            let retrievability = card.forgettingCurve(elapsedDays: card.elapsedDays, params: p)
             nextDS(&s, lastDifficulty: card.difficulty, lastStability: card.stability, retrievability: retrievability)
 
             var hardInterval = nextInterval(s: s.hard.stability)
@@ -323,19 +329,19 @@ public struct FSRS {
     }
 
     public func initStability(_ rating: Rating) -> Double {
-        return initStability(r: rating.rawValue)
+        initStability(r: rating.rawValue)
     }
 
     public func initStability(r: Int) -> Double {
-        return max(p.w[r - 1], 0.1)
+        max(p.w[r - 1], 0.1)
     }
 
     public func initDifficulty(_ rating: Rating) -> Double {
-        return initDifficulty(r: rating.rawValue)
+        initDifficulty(r: rating.rawValue)
     }
 
     public func initDifficulty(r: Int) -> Double {
-        return min(max(p.w[4] - p.w[5] * Double(r - 3), 1.0), 10.0)
+        min(max(p.w[4] - p.w[5] * Double(r - 3), 1.0), 10.0)
     }
 
     public func nextInterval(s: Double) -> Double {
@@ -358,7 +364,7 @@ public struct FSRS {
     }
 
     func meanReversion(_ initial: Double, current: Double) -> Double {
-        return p.w[7] * initial + (1 - p.w[7]) * current
+        p.w[7] * initial + (1 - p.w[7]) * current
     }
 
     public func nextRecallStability(d: Double, s: Double, r: Double, rating: Rating) -> Double {
@@ -368,6 +374,6 @@ public struct FSRS {
     }
 
     public func nextForgetStability(d: Double, s: Double, r: Double) -> Double {
-        min(p.w[11] * pow(d, -p.w[12]) * (pow(s + 1.0, p.w[13]) - 1) * exp((1.0 - r) * p.w[14]), s)
+        p.w[11] * pow(d, -p.w[12]) * (pow(s + 1.0, p.w[13]) - 1) * exp((1.0 - r) * p.w[14])
     }
 }
