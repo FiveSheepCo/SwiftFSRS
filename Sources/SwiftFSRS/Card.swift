@@ -33,13 +33,13 @@ public struct Card: Equatable, Codable {
         self.lastReview = lastReview
     }
 
-    func retrievability(for now: Date, params: Params) -> Double? {
+    public func retrievability(for now: Date, params: Params) -> Double? {
         guard status == .review else { return nil }
         let elapsedDays = max(0, (now.timeIntervalSince(lastReview) / Constants.secondsInDay))
         return forgettingCurve(elapsedDays: elapsedDays, params: params)
     }
     
-    func forgettingCurve(elapsedDays: Double, params p: Params) -> Double {
+    public func forgettingCurve(elapsedDays: Double, params p: Params) -> Double {
         pow(1.0 + p.factor * elapsedDays / stability, p.decay)
     }
 }

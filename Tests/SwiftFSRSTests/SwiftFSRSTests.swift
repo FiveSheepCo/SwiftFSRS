@@ -7,7 +7,7 @@
 
 import XCTest
 
-import FSRS
+@testable import SwiftFSRS
 
 final class FSRSTests: XCTestCase {
     func testExample() throws {

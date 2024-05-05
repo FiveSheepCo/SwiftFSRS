@@ -44,7 +44,7 @@ public extension FSRS {
                 s.schedule(now: now, hardInterval: hardInterval, goodInterval: goodInterval, easyInterval: easyInterval)
                 
             case .review:
-                let retrievability = card.forgettingCurve(params: p)
+                let retrievability = card.forgettingCurve(elapsedDays: card.elapsedDays, params: p)
                 nextDS(&s, lastDifficulty: card.difficulty, lastStability: card.stability, retrievability: retrievability)
                 
                 var hardInterval = nextInterval(s: s.hard.stability)

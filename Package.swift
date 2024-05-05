@@ -3,18 +3,18 @@
 import PackageDescription
 
 let package = Package(
-    name: "fsrs",
+    name: "SwiftFSRS",
     platforms: [
         .macOS(.v10_13), .iOS(.v14),
     ],
     products: [
-        .library(name: "FSRS", targets: ["FSRS"]),
+        .library(name: "SwiftFSRS", targets: ["SwiftFSRS"]),
     ],
     targets: [
-      .target(name: "FSRS"),
+      .target(name: "SwiftFSRS"),
       .testTarget(
-        name: "FSRSTests",
-        dependencies: [ "FSRS" ]
+        name: "SwiftFSRSTests",
+        dependencies: ["SwiftFSRS"]
       ),
     ]
 )
